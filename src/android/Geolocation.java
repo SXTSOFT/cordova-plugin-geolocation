@@ -30,6 +30,7 @@ import org.apache.cordova.PluginResult;
 import org.apache.cordova.LOG;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.security.auth.callback.Callback;
 
@@ -55,7 +56,7 @@ public class Geolocation extends CordovaPlugin {
     private static final int PERMISSION_REQUEST_CODE = 500;
 
 
-    String [] permissions = { 
+    String [] permissions = {
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -201,7 +202,7 @@ public class Geolocation extends CordovaPlugin {
                         //经度
                         coords.put("longitude", location.getLongitude());
 
-                        json.put('coords',coords);
+                        json.put("coords",coords);
 
                         json.put("status", "定位成功");
                         //定位类型
@@ -248,13 +249,13 @@ public class Geolocation extends CordovaPlugin {
                 }
                 PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, json);
                 pluginResult.setKeepCallback(true);
-                cb.sendPluginResult(pluginResult);
+                context.sendPluginResult(pluginResult);
             } catch (JSONException e) {
                 PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, e.getMessage());
                 pluginResult.setKeepCallback(true);
-                cb.sendPluginResult(pluginResult);
+                context.sendPluginResult(pluginResult);
             } finally {
-                if(ac.equals("getCurrentPosition")){
+                if(ac.equals("getCurrentPosition") && locationClient != null){
                    locationClient.stopLocation();
                 }
             }
@@ -266,16 +267,18 @@ public class Geolocation extends CordovaPlugin {
      *
      */
     private void startLocation() {
-        // 启动定位
-        locationClient.startLocation();
+        if(locationClient != null)
+            // 启动定位
+            locationClient.startLocation();
     }
 
     /**
      * 停止定位
      */
     private void stopLocation() {
-        // 停止定位
-        locationClient.stopLocation();
+        if(locationClient != null)
+            // 停止定位
+            locationClient.stopLocation();
     }
 
     /**
